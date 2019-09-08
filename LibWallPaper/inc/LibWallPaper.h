@@ -2,17 +2,17 @@
 #include <Windows.h>
 #define DLL_PUBLIC __declspec(dllexport)
 
-///´ò¿ªÖ¸¶¨Â·¾¶³ÌĞò£¬×î´ó»¯²¢·µ»Ø¾ä±ú
+///æ‰“å¼€æŒ‡å®šè·¯å¾„ç¨‹åºï¼Œæœ€å¤§åŒ–å¹¶è¿”å›å¥æŸ„
 DLL_PUBLIC HWND __cdecl wp_exec(char const* exefile, char const* params);
 
-//»ñÈ¡Í¨¹ı0x052C´´½¨µÄWorkerW hwnd
+//è·å–é€šè¿‡0x052Cåˆ›å»ºçš„WorkerW hwnd
 DLL_PUBLIC HWND __cdecl wp_get_workerw();
 
-//½«Ö¸¶¨HWNDÉèÎªWorkerWµÄ×Ó´°¿Ú
+//å°†æŒ‡å®šHWNDè®¾ä¸ºWorkerWçš„å­çª—å£
 DLL_PUBLIC int __cdecl wp_setup(HWND wnd);
 
-//»Ö¸´
+//æ¢å¤
 DLL_PUBLIC int __cdecl wp_unsetup(HWND wnd);
 
-//ÉèÖÃ´°¿ÚÎ»ÖÃ
+//è®¾ç½®çª—å£ä½ç½®
 DLL_PUBLIC int wp_set_winpos(HWND wnd, long left, long top, long right, long bottom);

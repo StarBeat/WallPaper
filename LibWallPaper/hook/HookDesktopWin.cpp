@@ -21,18 +21,18 @@ HWND FindShellWindow()
 	while (NULL == hSysListView32Wnd && uFindCount < 10)
 	{
 		HWND hParentWnd = ::GetShellWindow();
-		HWND hSHELLDLL_DefViewWnd = FindWindowEx(hParentWnd, NULL, L"SHELLDLL_DefView", NULL);
-		hSysListView32Wnd = FindWindowEx(hSHELLDLL_DefViewWnd, NULL, L"SysListView32", L"FolderView");
+		HWND hSHELLDLL_DefViewWnd = FindWindowExA(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
+		hSysListView32Wnd = FindWindowExA(hSHELLDLL_DefViewWnd, NULL, "SysListView32", "FolderView");
 
 		if (NULL == hSysListView32Wnd)
 		{
-			hParentWnd = FindWindowEx(NULL, NULL, L"WorkerW", L"");
+			hParentWnd = FindWindowExA(NULL, NULL, "WorkerW", "");
 			while ((!hSHELLDLL_DefViewWnd) && hParentWnd)
 			{
-				hSHELLDLL_DefViewWnd = FindWindowEx(hParentWnd, NULL, L"SHELLDLL_DefView", NULL);
-				hParentWnd = FindWindowEx(NULL, hParentWnd, L"WorkerW", L"");
+				hSHELLDLL_DefViewWnd = FindWindowExA(hParentWnd, NULL, "SHELLDLL_DefView", NULL);
+				hParentWnd = FindWindowExA(NULL, hParentWnd, "WorkerW", "");
 			}
-			hSysListView32Wnd = FindWindowEx(hSHELLDLL_DefViewWnd, 0, L"SysListView32", L"FolderView");
+			hSysListView32Wnd = FindWindowExA(hSHELLDLL_DefViewWnd, 0, "SysListView32", "FolderView");
 		}
 
 		if (NULL == hSysListView32Wnd)
@@ -60,13 +60,13 @@ void MySetForegroundWnd(HWND hWnd)
 	::AttachThreadInput(dwCurID, dwMyID, TRUE);
 	::SetForegroundWindow(hWnd);
 	//::AttachThreadInput(dwCurID, dwMyID, FALSE);
-	if (IsIconic(hWnd)) //��С��ʱ��ԭ��
+	if (IsIconic(hWnd)) //最小化时还原它
 		::ShowWindow(hWnd, SW_RESTORE);
 }
 
 //void MySetForegroundWnd(HWND hWnd)
 //{
-//	//���붯̬�����������
+//	//必须动态加载这个函数
 //	HMODULE hUser32 = GetModuleHandleA("user32");
 //	if (hUser32)
 //	{
@@ -108,8 +108,8 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 			RECT rc;
 			::GetWindowRect(_gNotifyWin, &rc);
 
-			int cx_screen = ::GetSystemMetrics(SM_CXSCREEN);  //��Ļ ��
-			int cy_screen = ::GetSystemMetrics(SM_CYSCREEN);  //     ��
+			int cx_screen = ::GetSystemMetrics(SM_CXSCREEN);  //屏幕 宽
+			int cy_screen = ::GetSystemMetrics(SM_CYSCREEN);  //     高
 
 			//ms->pt.x -= rc.left;
 			//ms->pt.y -= rc.right;
@@ -124,9 +124,9 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 	*/
 	//INPUT m_InPut = { 0 };
-	////�����Ϣ���轫type��ΪINPUT_MOUSE������Ǽ�����Ϣ,��type��ΪINPUT_KEYBOARD��
+	////鼠标消息，需将type置为INPUT_MOUSE，如果是键盘消息,将type置为INPUT_KEYBOARD。
 	//m_InPut.type = INPUT_MOUSE;
-	////��type��Ϊ�����Ϣ����INPUT�ṹ�е�mi�ṹ�ǿ���ʹ�õģ�hi��ki�ṹ����ʹ��
+	////将type置为鼠标消息后，其INPUT结构中的mi结构是可以使用的，hi、ki结构不可使用
 	//m_InPut.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
 	//m_InPut.mi.dx = ms->pt.x;
 	//m_InPut.mi.dy = ms->pt.y;
@@ -168,7 +168,7 @@ DLL_PUBLIC BOOL InstallHook(HWND hRecvMsgWin)
 		return false;
 	}
 
-	_gMsgHook = ::SetWindowsHookEx(WH_GETMESSAGE, hook_proc, (HINSTANCE)_gModule, tid);//ָ�����̻���Ӧhook_proc�ص�����ȫ����Ҫ��WH_MIN WH_MAX֮��
+	_gMsgHook = ::SetWindowsHookEx(WH_GETMESSAGE, hook_proc, (HINSTANCE)_gModule, tid);//指定进程会响应hook_proc回调，非全局需要在WH_MIN WH_MAX之间
 
 	if (_gMsgHook != NULL)
 	{

@@ -2,9 +2,15 @@
 -- for proj xmake project -k vs2017 -m "debug,release"
 add_rules("mode.debug", "mode.release")
 
+add_includedirs("LibWallPaper/inc")
+
+target("libhook")
+
+    set_kind("shared")
+    add_files("LibWallPaper/hook/*.cpp")
 -- define target
 target("test")
-
+    add_deps
     -- set kind
     set_kind("binary")--set_kind("static")
 

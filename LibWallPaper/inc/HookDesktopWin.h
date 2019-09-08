@@ -4,7 +4,6 @@
 #define DLL_PUBLIC __declspec(dllexport)
 
 HMODULE _gModule;
-HWND _gNotifyWin;
 
 
 DLL_PUBLIC BOOL InstallHook(HWND hRecvMsgWin);
