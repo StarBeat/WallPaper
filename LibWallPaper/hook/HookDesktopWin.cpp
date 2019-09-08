@@ -4,6 +4,11 @@
 #pragma region internal
 #pragma region data
 HHOOK _gMsgHook;
+#pragma data_seg("SharedData")
+HWND _gNotifyWin = NULL;
+HWND _gDskWin = NULL;
+#pragma data_seg()
+#pragma comment(linker,"/section:SharedData,RWS")  
 #pragma endregion
 
 
@@ -44,25 +49,104 @@ HWND FindShellWindow()
 	return hSysListView32Wnd;
 }
 
+void MySetForegroundWnd(HWND hWnd)
+{
+	HWND hCurWnd = NULL;
+	DWORD dwMyID;
+	DWORD dwCurID;
+	hCurWnd = ::GetForegroundWindow();
+	dwMyID = ::GetWindowThreadProcessId(hWnd, NULL); //::GetCurrentThreadId();
+	dwCurID = ::GetWindowThreadProcessId(hCurWnd, NULL);
+	::AttachThreadInput(dwCurID, dwMyID, TRUE);
+	::SetForegroundWindow(hWnd);
+	//::AttachThreadInput(dwCurID, dwMyID, FALSE);
+	if (IsIconic(hWnd)) //最小化时还原它
+		::ShowWindow(hWnd, SW_RESTORE);
+}
+
+//void MySetForegroundWnd(HWND hWnd)
+//{
+//	//必须动态加载这个函数
+//	HMODULE hUser32 = GetModuleHandleA("user32");
+//	if (hUser32)
+//	{
+//		void (WINAPI * SwitchToThisWindow)(HWND, BOOL) =
+//			(void(WINAPI*)(HWND, BOOL))GetProcAddress(hUser32, "SwitchToThisWindow");
+//		if (SwitchToThisWindow)
+//		{
+//			::SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+//			SwitchToThisWindow(hWnd, true);
+//			::SetWindowPos(hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+//			FreeLibrary(hUser32);
+//		}
+//	}
+//}
+
+//typedef    void    (WINAPI * PROCSWITCHTOTHISWINDOW)(HWND, BOOL);
+//HMODULE hUser32 = GetModuleHandleA("user32");
+//PROCSWITCHTOTHISWINDOW SwitchToThisWindow = (PROCSWITCHTOTHISWINDOW)GetProcAddress(hUser32, "SwitchToThisWindow");
 LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 {
-	MSG* msg = (MSG*)l;
-	printf("\n hook_proc\n");
-	if (NULL != msg && msg->hwnd != NULL)
+	MSG* ms = (MSG*)l;
+	if (NULL != ms && ms->hwnd != NULL)
 	{
-		switch (msg->message)
+		SetForegroundWindow(_gNotifyWin);
+		//SendMessage(_gNotifyWin, ms->message, ms->wParam, ms->lParam);
+		switch (ms->message)
 		{
 		case WM_MOUSEMOVE:
-			POINT pt = ((MOUSEHOOKSTRUCT*)l)->pt;
-			PostMessage(_gNotifyWin, WM_MOUSEMOVE, MK_CONTROL, MAKELPARAM(pt.x, pt.y));
-			break;
+		case WM_LBUTTONDOWN:
 		case WM_LBUTTONDBLCLK:
-			printf("\nWM_LBUTTONDBLCLK\n");
-			PostMessage(_gNotifyWin, WM_LBUTTONDBLCLK, w, l);
+		//case WM_RBUTTONDOWN:
+		//case WM_RBUTTONUP:
+		//case WM_RBUTTONDBLCLK:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_MBUTTONDBLCLK:
+		case WM_LBUTTONUP:
+		{
+			RECT rc;
+			::GetWindowRect(_gNotifyWin, &rc);
+
+			int cx_screen = ::GetSystemMetrics(SM_CXSCREEN);  //屏幕 宽
+			int cy_screen = ::GetSystemMetrics(SM_CYSCREEN);  //     高
+
+			//ms->pt.x -= rc.left;
+			//ms->pt.y -= rc.right;
+			SendMessage(_gNotifyWin, ms->message, ms->wParam, ms->lParam);
+			//ms->pt.x += rc.left;
+			//ms->pt.y += rc.right;
+
+	/*		mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+			Sleep(100);
+			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+	*/
+	//INPUT m_InPut = { 0 };
+	////鼠标消息，需将type置为INPUT_MOUSE，如果是键盘消息,将type置为INPUT_KEYBOARD。
+	//m_InPut.type = INPUT_MOUSE;
+	////将type置为鼠标消息后，其INPUT结构中的mi结构是可以使用的，hi、ki结构不可使用
+	//m_InPut.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+	//m_InPut.mi.dx = ms->pt.x;
+	//m_InPut.mi.dy = ms->pt.y;
+	//SendInput(1 , &m_InPut, sizeof(INPUT));
+
+	//char s[50];
+	//sprintf_s(s, "x:%d+y:%d", ms->pt.x, ms->pt.y);
+	//MessageBoxA(NULL, s, "Title", MB_OK);
+
+
+		}
+		break;
+		case WM_ACTIVATE:
+			ms->message = WM_NULL;
 			break;
-		default:
+		case WM_ACTIVATEAPP:
+			ms->message = WM_NULL;
 			break;
 		}
+
 	}
 	//PostMessage(_gNotifyWin, WM_COPYDATA, w, l);
 	return CallNextHookEx(_gMsgHook, code, w, l);
@@ -71,24 +155,28 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 
 DLL_PUBLIC BOOL InstallHook(HWND hRecvMsgWin)
 {
-	printf("\n InstallHook\n");
-	HWND dsk= FindShellWindow();
-	if (dsk == NULL)
+	_gDskWin = FindShellWindow();
+	if (_gDskWin == NULL)
 	{
 		return false;
 	}
 	_gNotifyWin = hRecvMsgWin;
 	DWORD dskPid = 0;
-	DWORD tid = ::GetWindowThreadProcessId(dsk, &dskPid);
+	DWORD tid = ::GetWindowThreadProcessId(_gDskWin, &dskPid);
 	if (dskPid == NULL)
 	{
 		return false;
 	}
-	_gMsgHook = ::SetWindowsHookEx(WH_KEYBOARD_LL, hook_proc, (HINSTANCE)_gModule, NULL);
+
+	_gMsgHook = ::SetWindowsHookEx(WH_GETMESSAGE, hook_proc, (HINSTANCE)_gModule, tid);//指定进程会响应hook_proc回调，非全局需要在WH_MIN WH_MAX之间
 
 	if (_gMsgHook != NULL)
 	{
 		return true;
+	}
+	else
+	{
+		printf("\n InstallHook Error:%d\n", GetLastError());
 	}
 
 	return false;

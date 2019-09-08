@@ -189,6 +189,7 @@ BOOL WINAPI EnumWindowsProc(HWND wnd, LPARAM lParam)
 		hp->hwd = wnd;
 		return FALSE;
 	}
+	hp->hwd = NULL;
 	return TRUE;
 }
 
@@ -198,6 +199,11 @@ HWND GetWindowByPid(HANDLE hProc)
 	HWND_PID hp;
 	hp.pid = ::GetProcessId(hProc);
 	EnumWindows(EnumWindowsProc, (LPARAM)&hp);
+	if (hp.hwd == NULL)
+	{
+		Sleep(1000);
+		EnumWindows(EnumWindowsProc, (LPARAM)& hp);
+	}
 	return hp.hwd;
 }
 
@@ -232,6 +238,7 @@ DLL_PUBLIC HWND wp_exec(char const* exefile, char const* params)
 		logi("create process success");
 		if (WaitForInputIdle(pi.hProcess, INFINITE) == 0)
 		{
+			Sleep(2000);//等待程序启动
 			HWND hwd = GetWindowByPid(pi.hProcess);
 			return hwd;
 		}
@@ -240,7 +247,7 @@ DLL_PUBLIC HWND wp_exec(char const* exefile, char const* params)
 //      CloseHandle(pi.hThread);  
 	}
 	else {
-		loge();
+		loge("exec erro!");
 	}
 	/*
 	HANDLE hd =ShellExecuteA(0, "open", exefile, params, 0, SW_SHOWMAXIMIZED);
