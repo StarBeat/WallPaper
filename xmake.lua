@@ -10,7 +10,7 @@ target("libhook")
     add_files("LibWallPaper/hook/*.cpp")
 -- define target
 target("test")
-    add_deps
+    add_deps("libhook")
     -- set kind
     set_kind("binary")--set_kind("static")
 
