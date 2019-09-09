@@ -82,9 +82,6 @@ void MySetForegroundWnd(HWND hWnd)
 //	}
 //}
 
-//typedef    void    (WINAPI * PROCSWITCHTOTHISWINDOW)(HWND, BOOL);
-//HMODULE hUser32 = GetModuleHandleA("user32");
-//PROCSWITCHTOTHISWINDOW SwitchToThisWindow = (PROCSWITCHTOTHISWINDOW)GetProcAddress(hUser32, "SwitchToThisWindow");
 LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 {
 	MSG* ms = (MSG*)l;
@@ -123,19 +120,18 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 	*/
-	//INPUT m_InPut = { 0 };
-	////鼠标消息，需将type置为INPUT_MOUSE，如果是键盘消息,将type置为INPUT_KEYBOARD。
-	//m_InPut.type = INPUT_MOUSE;
-	////将type置为鼠标消息后，其INPUT结构中的mi结构是可以使用的，hi、ki结构不可使用
-	//m_InPut.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-	//m_InPut.mi.dx = ms->pt.x;
-	//m_InPut.mi.dy = ms->pt.y;
-	//SendInput(1 , &m_InPut, sizeof(INPUT));
+		//INPUT m_InPut = { 0 };
+		////鼠标消息，需将type置为INPUT_MOUSE，如果是键盘消息,将type置为INPUT_KEYBOARD。
+		//m_InPut.type = INPUT_MOUSE;
+		////将type置为鼠标消息后，其INPUT结构中的mi结构是可以使用的，hi、ki结构不可使用
+		//m_InPut.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+		//m_InPut.mi.dx = ms->pt.x;
+		//m_InPut.mi.dy = ms->pt.y;
+		//SendInput(1 , &m_InPut, sizeof(INPUT));
 
-	//char s[50];
-	//sprintf_s(s, "x:%d+y:%d", ms->pt.x, ms->pt.y);
-	//MessageBoxA(NULL, s, "Title", MB_OK);
-
+		//char s[50];
+		//sprintf_s(s, "x:%d+y:%d", ms->pt.x, ms->pt.y);
+		//MessageBoxA(NULL, s, "Title", MB_OK);
 
 		}
 		break;
@@ -203,8 +199,11 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 		_gModule = hModule;
 		break;
 	case DLL_THREAD_ATTACH:
+		break;
 	case DLL_THREAD_DETACH:
+		break;
 	case DLL_PROCESS_DETACH:
+		_gModule = NULL;
 		break;
 	}
 	return TRUE;

@@ -3,11 +3,13 @@
 add_rules("mode.debug", "mode.release")
 
 add_includedirs("LibWallPaper/inc")
+add_defines("__config_x64__") --默认64位
 
 target("libhook")
-
     set_kind("shared")
     add_files("LibWallPaper/hook/*.cpp")
+    add_files("LibWallPaper/src/LibWallPaper.cpp")
+
 -- define target
 target("test")
     add_deps("libhook")
@@ -15,8 +17,8 @@ target("test")
     set_kind("binary")--set_kind("static")
 
     -- add files
-    add_files("LibWallPaper/src/LibWallPaper.cpp")
-    add_files("LibWallPaper/src/libWinWallpaper.cpp")
+
+    add_files("sample/libWinWallpaper.cpp")
 
 --
 -- FAQ
