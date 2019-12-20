@@ -94,13 +94,13 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONDBLCLK:
-		//case WM_RBUTTONDOWN:
-		//case WM_RBUTTONUP:
-		//case WM_RBUTTONDBLCLK:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_RBUTTONDBLCLK:
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP:
-		case WM_MBUTTONDBLCLK:
-		case WM_LBUTTONUP:
+		case WM_MBUTTONDBLCLK://点击或右击 按下会失去焦点，滚轮点击不会
 		{
 			RECT rc;
 			::GetWindowRect(_gNotifyWin, &rc);
@@ -136,8 +136,6 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 		}
 		break;
 		case WM_ACTIVATE:
-			ms->message = WM_NULL;
-			break;
 		case WM_ACTIVATEAPP:
 			ms->message = WM_NULL;
 			break;

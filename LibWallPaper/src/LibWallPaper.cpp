@@ -371,21 +371,17 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 		WS_THICKFRAME |
 		WS_SYSMENU |
 		WS_MAXIMIZEBOX |
-		WS_MINIMIZEBOX|
-		WS_POPUP|
-		WS_VISIBLE
+		WS_MINIMIZEBOX
 		);
-
 	ex_and = ~(
 		WS_EX_DLGMODALFRAME |
 		WS_EX_COMPOSITED |
 		WS_EX_WINDOWEDGE |
 		WS_EX_CLIENTEDGE |
-		WS_EX_LAYERED |
 		WS_EX_STATICEDGE |
 		WS_EX_TOOLWINDOW |
+		WS_EX_LAYERED |
 		WS_EX_APPWINDOW
-		/*WS_EX_TRANSPARENT*/
 		);
 
 	if (update_window_styles(wnd, _and, ex_and, WS_CHILD, 0)) {
@@ -402,7 +398,6 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 
 	ShowWindow(wnd, SW_SHOW);
 	wp_set_winpos(wnd, r.left, r.top, r.right, r.bottom);
-
 	return 0;
 }
 
