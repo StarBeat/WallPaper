@@ -21,18 +21,20 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		hd = wp_exec("C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", "");
+		//hd = wp_exec("C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", "");
+		hd = wp_exec("E:/LE/Unity/DeskTop/Sakura_DesktopMascot/bin/Sakura_DesktopMascot.exe", "");
 	}
 
-	InstallHook(hd);
-	wp_setup(hd);
+	if (IsWindow(hd))
+	{
+		InstallHook(hd);
+		wp_setup(hd);
+
+	}
 	std::cout << "Hello World!\n" << GetLastError() << std::endl;
-	atexit([]() {
-		UninstallHook();
-		wp_unsetup(hd);
-		});
 	while (true)
 	{
+		Sleep(10);
 		if (getchar() == 'q') {
 			break;
 		}
@@ -46,6 +48,12 @@ int main(int argc, char* argv[])
 	//		DispatchMessage(&ms);
 	//	}
 	//}
+	atexit([]() {
+			UninstallHook();
+			wp_unsetup(hd);
+			SendMessage(hd, WM_CLOSE, 0, 0);
+		});
 	UninstallHook();
 	wp_unsetup(hd);
+	SendMessage(hd, WM_CLOSE, 0, 0);
 }

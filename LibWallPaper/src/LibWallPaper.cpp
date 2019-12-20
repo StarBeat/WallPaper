@@ -1,5 +1,7 @@
 ﻿#include "LibWallPaper.h"
 #include <stdio.h>
+#include <uxtheme.h>
+#include <dwmapi.h>
 
 #pragma comment(lib, "User32") 
 #pragma comment(lib, "Shell32") 
@@ -101,7 +103,8 @@ errcheck:
 	exstyle &= ex_and;
 	style |= _or;
 	style |= ex_or;
-
+	//MARGINS margins = { -1 };
+	//DwmExtendFrameIntoClientArea(wnd, &margins);//设置无边框
 	SetLastError(0);
 
 	if (!SetWindowLongA(wnd, GWL_STYLE, style) ||
@@ -368,7 +371,9 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 		WS_THICKFRAME |
 		WS_SYSMENU |
 		WS_MAXIMIZEBOX |
-		WS_MINIMIZEBOX
+		WS_MINIMIZEBOX|
+		WS_POPUP|
+		WS_VISIBLE
 		);
 
 	ex_and = ~(
@@ -380,6 +385,7 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 		WS_EX_STATICEDGE |
 		WS_EX_TOOLWINDOW |
 		WS_EX_APPWINDOW
+		/*WS_EX_TRANSPARENT*/
 		);
 
 	if (update_window_styles(wnd, _and, ex_and, WS_CHILD, 0)) {
