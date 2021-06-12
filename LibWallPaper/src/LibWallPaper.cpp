@@ -71,6 +71,7 @@ BOOL CALLBACK find_worker(HWND wnd, LPARAM lp)
 
 	*pworker = FindWindowExA(0, wnd, "WorkerW", 0);
 	if (*pworker) {
+		//SendMessageA(*pworker, WM_CLOSE, 0, 0); 关闭这个WorkerW 直接作为Progman子窗口也可以
 		log_window("wallpaper is ", *pworker);
 		log_window("its parent is ", wnd);
 		return FALSE;

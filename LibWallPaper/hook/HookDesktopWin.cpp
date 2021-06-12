@@ -87,11 +87,9 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 	MSG* ms = (MSG*)l;
 	if (NULL != ms && ms->hwnd != NULL)
 	{
-		SetForegroundWindow(_gNotifyWin);
 		//SendMessage(_gNotifyWin, ms->message, ms->wParam, ms->lParam);
 		switch (ms->message)
 		{
-		case WM_MOUSEMOVE:
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONUP:
@@ -101,6 +99,8 @@ LRESULT CALLBACK hook_proc(int code, WPARAM w, LPARAM l)
 		case WM_MBUTTONDOWN:
 		case WM_MBUTTONUP:
 		case WM_MBUTTONDBLCLK://点击或右击 按下会失去焦点，滚轮点击不会
+			SetForegroundWindow(_gNotifyWin);
+		case WM_MOUSEMOVE:
 		{
 			RECT rc;
 			::GetWindowRect(_gNotifyWin, &rc);
