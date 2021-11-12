@@ -160,7 +160,7 @@ errcheck:
 
 int wp_map_rect(HWND wnd, RECT* mapped)
 {
-	if (GetWindowRect(wnd, mapped)) 
+	if (GetWindowRect(wnd, mapped) && !!GetLastError())
 	{
 		loge("GetWindowRect failed, GLE=%08X", GetLastError());
 		return -1;
@@ -304,7 +304,7 @@ DLL_PUBLIC HWND wp_get_workerw()
 	SendMessageA(progman, 0x052C, 0xD, 0);
 	SendMessageA(progman, 0x052C, 0xD, 1);
 
-	EnumWindows(find_worker, (LPARAM)& worker);
+	EnumWindows(find_worker, (LPARAM)&worker);
 
 	if (!worker)
 	{
@@ -342,7 +342,7 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 	char wndclass[512];
 	HWND wallpaper = wp_get_workerw();
 	long _and, ex_and;
-	RECT r;
+	RECT r{0};
 
 	*wndclass = 0;
 	GetClassNameA(wnd, wndclass, sizeof(wndclass) - 1);
@@ -383,7 +383,8 @@ DLL_PUBLIC int wp_setup(HWND wnd)
 		WS_EX_TOOLWINDOW |
 		WS_EX_LAYERED |
 		WS_EX_APPWINDOW
-		);
+		)
+		;
 
 	if (update_window_styles(wnd, _and, ex_and, WS_CHILD, 0)) {
 		return -1;

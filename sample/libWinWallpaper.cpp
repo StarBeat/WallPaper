@@ -21,8 +21,8 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		//hd = wp_exec("C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", "");
-		hd = wp_exec("E:/LE/Unity/DeskTop/Sakura_DesktopMascot/bin/Sakura_DesktopMascot.exe", "");
+		hd = wp_exec("C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", "");
+		//hd = wp_exec("E:/LE/Unity/DeskTop/Sakura_DesktopMascot/bin/Sakura_DesktopMascot.exe", "");
 	}
 
 	if (IsWindow(hd))
